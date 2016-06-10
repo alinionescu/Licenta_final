@@ -1,0 +1,54 @@
+app:
+    resource: "@AppBundle/Controller/"
+    type:     annotation
+
+admin_add_user:
+    defaults: { _controller: "AppBundle:Admin:addUser" }
+    path: /add
+
+admin_promote_user_list:
+    defaults: { _controller: "AppBundle:Admin:promoteUserList" }
+    path: /promote-user-list
+    
+admin_promote_user:
+    defaults: { _controller: "AppBundle:Admin:promoteUser", id: 0 ,role: "ROLE_USER" }
+    path: /promote-user/{id}/{role}/
+
+admin_edit_user:
+    defaults: { _controller: "AppBundle:Admin:editUser" }
+    path: /edit-user
+    
+admin_demote_user:
+    defaults: { _controller: "AppBundle:Admin:demoteUser",  id: 0 ,role: "ROLE_USER" }
+    path: /demote-user/{id}/{role}/
+
+fos_user:
+    resource: "@FOSUserBundle/Resources/config/routing/security.xml"
+
+app_registration:
+    defaults: { _controller: "AppBundle:Registration:register" }
+    path: /register/
+
+avanzu_admin_profile:
+    defaults: { _controller: "AppBundle:Security:show" }
+    path: /profile
+
+avanzu_admin_logout:
+    defaults: { _controller: "FOSUserBundle:Security:logout" }
+    path: /logout
+
+app_list_document:
+    defaults: { _controller: "AppBundle:Default:listDocument" }
+    path: /list-document
+
+app_edit_document:
+    defaults: { _controller: "AppBundle:Default:editDocument", id: 0 }
+    path: /edit-document/{id}
+
+app_add_document:
+    defaults: { _controller: "AppBundle:Default:addDocument" }
+    path: /add-document
+
+app_delete_document:
+    defaults: { _controller: "AppBundle:Default:deleteDocument" }
+    path: /delete-document

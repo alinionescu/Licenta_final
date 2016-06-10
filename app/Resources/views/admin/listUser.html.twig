@@ -1,0 +1,73 @@
+{% extends '::layout.html.twig' %}
+
+{% block page_title %}
+    Admin
+{% endblock %}
+
+{% block page_subtitle %}
+    Lista useri
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script type="text/javascript" src="{{ asset('bundles/app/user.js') }}"></script>
+{% endblock %}
+
+{% block page_content %}
+    <div class="panel panel-default">
+        <div class="panel-body">Promote Users</div>
+        {% for flashMessage in app.session.flashbag.get('error') %}
+            {{ flashMessage }}
+        {% endfor %}
+        {% for flashMessage in app.session.flashbag.get('success') %}
+            {{ flashMessage }}
+        {% endfor %}
+    </div>
+    
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>UserName</th>
+                <th>Email</th>
+                <th>Roles</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+    {% for user in users %}            
+        <tr>
+            <td>{{ user.getUserName }}</td>
+            <td>{{ user.getUserName }}</td>
+            <td>{{ user.getEmail }}</td>
+            <td>{% for role in user.getRoles %} | {{ role }} | {% endfor %} </td>
+            <td>
+                <div class="dropdown" style="float: left; margin-right: 5px">
+                    <button class="btn btn-default dropdown-toggle" type="button" id="promote" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+                        Promote
+                        <span class="caret"></span>
+                    </button>
+                    <ul class="dropdown-menu" aria-labelledby="promote">
+                        <li><a href="{{ path('admin_promote_user', {'id':user.getId(),'role':'ROLE_SUPER_ADMIN'}) }}">Admin</a></li>
+                        <li><a href="{{ path('admin_promote_user', {'id':user.getId(),'role':'ROLE_ADMIN'}) }}">Profesor</a></li>
+                        <li><a href="{{ path('admin_promote_user', {'id':user.getId(),'role':'ROLE_USER'}) }}">Student</a></li>
+                    </ul>
+                </div>
+                <div class="dropdown" style="float: left; margin-right: 5px">
+                    <button class="btn btn-danger dropdown-toggle" type="button" id="demote" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+                        Demote
+                        <span class="caret"></span>
+                    </button>
+                    <ul class="dropdown-menu" aria-labelledby="demote">
+                        <li><a href="{{ path('admin_demote_user', {'id':user.getId(),'role':'ROLE_SUPER_ADMIN'}) }}">Admin</a></li>
+                        <li><a href="{{ path('admin_demote_user', {'id':user.getId(),'role':'ROLE_ADMIN'}) }}">Profesor</a></li>
+                        <li><a href="{{ path('admin_demote_user', {'id':user.getId(),'role':'ROLE_USER'}) }}">Student</a></li>
+                    </ul>
+                </div>
+                <a href="{{ path('admin_edit_user') }}" class="btn btn-info" data-toggle="control-sidebar">Edit</a>
+            </td>
+        </tr>
+    {% endfor %}  
+        </tbody>
+    </table>
+{% endblock %}

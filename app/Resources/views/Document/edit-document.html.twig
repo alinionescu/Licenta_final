@@ -1,0 +1,41 @@
+{% extends '::layout.html.twig' %}
+
+{% block page_title %}
+    Documents
+{% endblock %}
+
+{% block page_subtitle %}
+    Edit
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script type="text/javascript" src="{{ asset('bundles/app/js/document.js') }}"></script>
+{% endblock %}
+
+{% block page_content %}
+
+    {% for flashMessage in app.session.flashbag.get('error') %}
+        <div class="alert alert-danger" role="alert">{{ flashMessage }}</div>
+    {% endfor %}
+    {% for flashMessage in app.session.flashbag.get('success') %}
+        <div class="alert alert-success" role="alert">{{ flashMessage }}</div>
+    {% endfor %}
+
+    <a type="button" class="btn btn-primary" href="{{ path('app_list_document')}}">Lista licente</a>
+    <!-- <button id="add-document" type="button" class="btn btn-primary">Adauga licenta</button> -->
+    <br /><br />
+
+    <div class="panel panel-default">
+        <div class="panel-body">
+            Editeaza tema licenta
+        </div>
+    </div>
+
+    {{ form_start(form, {'method': 'post', 'action': path('app_edit_document')}) }}
+    {{ form_widget(form) }}
+    <div>
+        <button type="submit" class="btn btn-primary btn-block btn-flat">Editeaza tema licenta</button>
+    </div>
+    {{ form_end(form) }}
+{% endblock %}

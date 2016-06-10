@@ -1,0 +1,34 @@
+# Learn more about services, parameters and containers at
+# http://symfony.com/doc/current/book/service_container.html
+parameters:
+    my_admin_bundle.show_user_listener.class: AppBundle\EventListener\MyShowUserListener
+    my_admin_bundle.menu_listener.class: AppBundle\EventListener\MyMenuItemListListener
+    registration.form.type.class: AppBundle\Form\RegistrationFormType
+    app_document.class: AppBundle\Service\DocumentService
+    app_document_type.class: AppBundle\Form\DocumentType
+
+services:
+    my_admin_bundle.show_user_listener:
+        class: %my_admin_bundle.show_user_listener.class%
+        arguments: [ '@security.token_storage' ]
+        tags:
+            - { name: kernel.event_listener, event: theme.navbar_user, method: onShowUser }
+
+    my_admin_bundle.menu_listener:
+        class: %my_admin_bundle.menu_listener.class%
+        arguments: [ '@security.token_storage', '@security.authorization_checker' ]
+        tags:
+            - { name: kernel.event_listener, event:theme.sidebar_setup_menu, method:onSetupMenu }
+
+    registration.form.type:
+        class: %registration.form.type.class%
+        arguments: [%fos_user.model.user.class%]
+        tags:
+            - { name: form.type, alias: frontend_user_registration }
+
+    app_document:
+        class: %app_document.class%
+        arguments: [ '@doctrine.orm.entity_manager' ]
+
+    app_document_type:
+        class: %app_document_type.class%

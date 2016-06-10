@@ -1,0 +1,15 @@
+{% extends '::layout.html.twig' %}
+
+{% block page_content %}
+<div class="login-box">
+    <div class="login-logo">
+        <b>Admin</b>
+    </div><!-- /.login-logo -->
+    <div class="login-box-body">
+        <p class="login-box-msg">Register</p>
+    {% block fos_user_content %}
+        {% include "FOSUserBundle:Registration:register_content.html.twig" %}
+    {% endblock fos_user_content %}
+    </div><!-- /.login-box-body -->
+</div>
+{% endblock %}

@@ -1,0 +1,40 @@
+{% extends '::layout.html.twig' %}
+
+{% block page_title %}
+    Document
+{% endblock %}
+
+{% block page_subtitle %}
+    Add
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script type="text/javascript" src="{{ asset('bundles/app/js/document.js') }}"></script>
+{% endblock %}
+
+{% block page_content %}
+    <a type="button" class="btn btn-primary" href="{{ path('app_list_document')}}">List licente</a>
+    <!-- <button id="add-document" type="button" class="btn btn-primary">Adauga licenta</button> -->
+    <br /><br />
+
+    {% for flashMessage in app.session.flashbag.get('error') %}
+        <div class="alert alert-danger" role="alert">{{ flashMessage }}</div>
+    {% endfor %}
+    {% for flashMessage in app.session.flashbag.get('success') %}
+        <div class="alert alert-success" role="alert">{{ flashMessage }}</div>
+    {% endfor %}
+
+    <div class="panel panel-default">
+        <div class="panel-body">
+            Adauga tema licenta
+        </div>
+    </div>
+
+    {{ form_start(form, {'method': 'post', 'action': path('app_add_document')}) }}
+    {{ form_widget(form) }}
+    <div>
+        <button type="submit" class="btn btn-primary btn-block btn-flat">Adauga tema licenta</button>
+    </div>
+    {{ form_end(form) }}
+{% endblock %}

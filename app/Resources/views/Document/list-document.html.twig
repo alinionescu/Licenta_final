@@ -1,0 +1,64 @@
+{% extends '::layout.html.twig' %}
+
+{% block page_title %}
+    Home
+{% endblock %}
+
+{% block page_subtitle %}
+    Documents
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script type="text/javascript" src="{{ asset('bundles/app/js/document.js') }}"></script>
+{% endblock %}
+
+{% block page_content %}
+    <a type="button" class="btn btn-primary" href="{{ path('app_add_document')}}">Adauga Licenta</a>
+    <!-- <button id="add-document" type="button" class="btn btn-primary">Adauga licenta</button> -->
+    <br /><br />
+
+    {% for flashMessage in app.session.flashbag.get('error') %}
+        <div class="alert alert-danger" role="alert">{{ flashMessage }}</div>
+    {% endfor %}
+    {% for flashMessage in app.session.flashbag.get('success') %}
+        <div class="alert alert-success" role="alert">{{ flashMessage }}</div>
+    {% endfor %}
+
+    <div class="panel panel-default">
+        <div class="panel-body">
+            Lista de licente
+        </div>
+    </div>
+    <table class="table">
+        <thead>
+        <tr>
+            <th>Crt</th>
+            <th>Nume Licenta</th>
+            <th>Descriere</th>
+            <th>Actions</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for document in documents %}
+            <tr>
+                <td>{{ document.getId }}</td>
+                <td>{{ document.getName }}</td>
+                <td>{{ document.getDescription }}</td>
+                <td>
+                    <div class="dropdown" style="float: left; margin-right: 5px">
+                        <button class="btn btn-default dropdown-toggle" type="button" id="promote" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+                            Actiuni
+                            <span class="caret"></span>
+                        </button>
+                        <ul class="dropdown-menu" aria-labelledby="promote">
+                            <li><a href="{{ path('app_edit_document', {'id':document.getId() }) }}">Editeaza</a></li>
+                            <li><a href="{{ path('app_delete_document', {'id':document.getId() }) }}">Sterge</a></li>
+                        </ul>
+                    </div>
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+{% endblock %}
