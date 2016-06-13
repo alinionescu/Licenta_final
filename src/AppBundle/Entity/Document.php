@@ -11,6 +11,9 @@ use Doctrine\ORM\Mapping as ORM;
  */
 class Document
 {
+    const STATUS_ENABLE = 1;
+    const STATUS_DISABLE = 0;
+
     /**
      * @var integer
      * @ORM\Id
@@ -44,14 +47,7 @@ class Document
     protected $status;
 
     /**
-     * @var Person
-     * @ORM\OneToOne(targetEntity="AppBundle\Entity\Person", mappedBy="document", fetch="EXTRA_LAZY")
-     * @ORM\JoinColumn(name="id", referencedColumnName="id")
-     */
-    protected $person;
-
-    /**
-     * @ORM\ManyToMany(targetEntity="AppBundle\Entity\Person", mappedBy="documents")
+     * @ORM\ManyToMany(targetEntity="AppBundle\Entity\Person", cascade={"persist"}, mappedBy="documents")
      */
     protected $persons;
 
@@ -148,6 +144,14 @@ class Document
     }
 
     /**
+     * @return bool
+     */
+    public function getStatus()
+    {
+        return $this->status;
+    }
+
+    /**
      * @return Student
      */
     public function getStudent()
@@ -208,6 +212,10 @@ class Document
     {
         if ($this->getCreated() === null) {
             $this->created = new \DateTime();
+        }
+
+        if ($this->getModified() === null) {
+            $this->modified = new \DateTime();
         }
     }
 }

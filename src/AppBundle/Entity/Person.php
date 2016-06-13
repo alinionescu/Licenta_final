@@ -3,6 +3,8 @@
 namespace AppBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use Doctrine\ORM\Mapping\JoinTable;
+use Doctrine\ORM\Mapping\JoinColumn;
 
 /**
  * @ORM\Entity
@@ -31,13 +33,6 @@ class Person
      * @ORM\Column(name="id_matricol", type="integer", nullable=true)
      */
     protected $matricol;
-
-    /**
-     * @var Document
-     * @ORM\OneToOne(targetEntity="AppBundle\Entity\Document", inversedBy="person", fetch="EXTRA_LAZY")
-     * @ORM\JoinColumn(name="id_document", referencedColumnName="id")
-     */
-    protected $document;
 
     /**
      * @var PersonType
@@ -89,12 +84,16 @@ class Person
     protected $modified;
 
     /**
-     * @ORM\ManyToMany(targetEntity="AppBundle\Entity\Meetings", inversedBy="persons")
+     * @ORM\ManyToMany(targetEntity="AppBundle\Entity\Meetings", cascade={"persist"}, inversedBy="persons")
      */
     protected $meetings;
 
     /**
-     * @ORM\ManyToMany(targetEntity="AppBundle\Entity\Document", inversedBy="persons")
+     * @ORM\ManyToMany(targetEntity="AppBundle\Entity\Document", cascade={"persist"}, inversedBy="persons")
+     * @JoinTable(name="person_document",
+     *     joinColumns={@JoinColumn(name="person_id", referencedColumnName="id")},
+     *     inverseJoinColumns={@JoinColumn(name="document_id", referencedColumnName="id")}
+     *     )
      */
     protected $documents;
 
@@ -321,6 +320,10 @@ class Person
     {
         if (!$this->getCreated()) {
             $this->created = new \DateTime();
+        }
+
+        if ($this->getModified() === null) {
+            $this->modified = new \DateTime();
         }
     }
 }

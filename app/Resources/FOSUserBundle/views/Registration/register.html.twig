@@ -5,6 +5,14 @@
     <div class="login-logo">
         <b>Admin</b>
     </div><!-- /.login-logo -->
+
+    {% for flashMessage in app.session.flashbag.get('error') %}
+        <div class="alert alert-danger" role="alert">{{ flashMessage }}</div>
+    {% endfor %}
+    {% for flashMessage in app.session.flashbag.get('success') %}
+        <div class="alert alert-success" role="alert">{{ flashMessage }}</div>
+    {% endfor %}
+
     <div class="login-box-body">
         <p class="login-box-msg">Register</p>
     {% block fos_user_content %}

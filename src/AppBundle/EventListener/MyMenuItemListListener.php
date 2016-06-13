@@ -101,9 +101,11 @@ class MyMenuItemListListener
 
             /** Meniu pentru Profesor */
             if ($type === PersonType::PERSON_TYPE_PROFESOR) {
-                $profesor = new MenuItemModel('DocumenteLicenta', 'Documente licenta', 'app_list_document', array(/* options */), 'iconclasses fa fa-plane');
+                $profesor = new MenuItemModel('DocumenteLicenta', 'Teme licenta', 'app_list_document', array(/* options */), 'iconclasses fa fa-plane');
+                $profesor2 = new MenuItemModel('Mettings', 'Intalniri', 'app_list_document', array(/* options */), 'iconclasses fa fa-plane');
 
                 array_push($menuItems, $profesor);
+                array_push($menuItems, $profesor2);
             }
 
             /** Meniu pentru Student */
@@ -112,16 +114,6 @@ class MyMenuItemListListener
 
                 array_push($menuItems, $student);
             }
-
-            $blog = new MenuItemModel('ItemId', 'Primul item', '', array(/* options */), 'iconclasses fa fa-plane');
-            $action = new MenuItemModel('actionId', 'Action', 'fos_user_security_login', array(), 'fa fa-rss-square');
-
-            // A child with default circle icon
-            $blog->addChild(new MenuItemModel('ChildTwoItemId', 'ChildTwoDisplayName', 'fos_user_security_login'));
-
-             array_push($menuItems, $blog);
-             array_push($menuItems, $action);
-
         } else {
             $login = new MenuItemModel('loginId', 'Login', 'fos_user_security_login', array(/* options */), 'iconclasses fa fa-plane');
             array_push($menuItems, $login);

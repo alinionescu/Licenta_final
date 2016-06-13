@@ -10,11 +10,18 @@ class DocumentService
     /** @var  EntityManager */
     protected $entityManager;
 
+    /**
+     * DocumentService constructor.
+     * @param EntityManager $entityManager
+     */
     public function __construct(EntityManager $entityManager)
     {
         $this->entityManager = $entityManager;
     }
 
+    /**
+     * @return array
+     */
     public function getAllDocuments()
     {
         /** @var DocumentRepository $documentRepository */

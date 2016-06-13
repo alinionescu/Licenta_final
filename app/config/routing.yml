@@ -52,3 +52,7 @@ app_add_document:
 app_delete_document:
     defaults: { _controller: "AppBundle:Default:deleteDocument" }
     path: /delete-document
+
+app_active_document:
+    defaults: { _controller: "AppBundle:Default:activeDocument" }
+    path: /active-document

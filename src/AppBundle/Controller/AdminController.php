@@ -75,6 +75,8 @@ class AdminController extends Controller
      */
     public function promoteUserAction(Request $request)
     {
+
+
         $role = $request->get('role');
         $userId = $request->get('id');
 

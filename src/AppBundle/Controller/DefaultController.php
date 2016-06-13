@@ -36,6 +36,9 @@ class DefaultController extends Controller
         return $this->render(':admin:index.html.twig');
     }
 
+    /**
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
     public function listDocumentAction()
     {
         /** @var DocumentService $documentService */
@@ -48,6 +51,10 @@ class DefaultController extends Controller
         ]);
     }
 
+    /**
+     * @param Request $request
+     * @return RedirectResponse|\Symfony\Component\HttpFoundation\Response
+     */
     public function editDocumentAction(Request $request)
     {
         $documentId = intval($request->get('id'));
@@ -57,7 +64,7 @@ class DefaultController extends Controller
 
         $document = $documentRepository->findOneBy(array('id' => $documentId));
 
-        $form = $this->createForm('AppBundle\Form\DocumentType');
+        $form = $this->createForm(DocumentType::class, $document);
 
         if (null === $document) {
             $this->get('session')->getFlashBag()->add('error', 'No Document Found');
@@ -70,10 +77,31 @@ class DefaultController extends Controller
             ]);
         }
 
+        $form->handleRequest($request);
         $form->setData($document);
+
+        if ($form->isValid() && $form->isSubmitted()) {
+            $entityManager = $this->container->get('doctrine')->getManager();
+
+            $document = $form->getData();
+
+            $entityManager->persist($document);
+            $entityManager->flush();
+
+            $this->get('session')->getFlashBag()->add('success', 'Document salvat cu success');
+
+            return $this->render(':Document:add-document.html.twig', [
+                'form' => $form->createView()
+            ]);
+
+            $url = $this->generateUrl('app_list_document');
+
+            return new RedirectResponse($url);
+        }
 
         return $this->render(':Document:edit-document.html.twig', [
             'documents' => [],
+            'document' => $document,
             'form' => $form->createView()
         ]);
     }
@@ -98,10 +126,6 @@ class DefaultController extends Controller
 
             $this->get('session')->getFlashBag()->add('success', 'Document salvat cu success');
 
-            return $this->render(':Document:add-document.html.twig', [
-                'form' => $form->createView()
-            ]);
-
             $url = $this->generateUrl('app_list_document');
             return new RedirectResponse($url);
         }
@@ -111,14 +135,68 @@ class DefaultController extends Controller
         ]);
     }
 
+    /**
+     * @param Request $request
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
     public function deleteDocumentAction(Request $request)
     {
         $documentId = intval($request->get('id'));
-        $form = $this->createForm('AppBundle\Form\DocumentType');
 
-        return $this->render(':Document:add-document.html.twig', [
-            'documents' => [],
-            'form' => $form->createView()
+        /** @var DocumentRepository $documentRepository */
+        $documentRepository = $this->container->get('doctrine')->getManager()->getRepository('AppBundle:Document');
+
+        /** @var Document $document */
+        $document = $documentRepository->findOneBy(array('id' => $documentId));
+
+        $document->setStatus(Document::STATUS_DISABLE);
+
+        $entityManager = $this->container->get('doctrine')->getManager();
+        $entityManager->persist($document);
+        $entityManager->flush();
+
+        /** @var DocumentService $documentService */
+        $documentService = $this->container->get('app_document');
+
+        $documents = $documentService->getAllDocuments();
+
+        return $this->render(':Document:list-document.html.twig', [
+            'documents' => $documents
         ]);
+    }
+
+    /**
+     * @param Request $request
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
+    public function activeDocumentAction(Request $request)
+    {
+        $documentId = intval($request->get('id'));
+
+        /** @var DocumentRepository $documentRepository */
+        $documentRepository = $this->container->get('doctrine')->getManager()->getRepository('AppBundle:Document');
+
+        /** @var Document $document */
+        $document = $documentRepository->findOneBy(array('id' => $documentId));
+
+        $document->setStatus(Document::STATUS_ENABLE);
+
+        $entityManager = $this->container->get('doctrine')->getManager();
+        $entityManager->persist($document);
+        $entityManager->flush();
+
+        /** @var DocumentService $documentService */
+        $documentService = $this->container->get('app_document');
+
+        $documents = $documentService->getAllDocuments();
+
+        return $this->render(':Document:list-document.html.twig', [
+            'documents' => $documents
+        ]);
+    }
+    
+    public function listMettings(Request $request)
+    {
+        
     }
 }

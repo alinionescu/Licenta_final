@@ -41,7 +41,7 @@
         </thead>
         <tbody>
         {% for document in documents %}
-            <tr>
+            <tr {% if document.getStatus() == 0 %}  class="alert-danger" {% endif %}>
                 <td>{{ document.getId }}</td>
                 <td>{{ document.getName }}</td>
                 <td>{{ document.getDescription }}</td>
@@ -54,6 +54,9 @@
                         <ul class="dropdown-menu" aria-labelledby="promote">
                             <li><a href="{{ path('app_edit_document', {'id':document.getId() }) }}">Editeaza</a></li>
                             <li><a href="{{ path('app_delete_document', {'id':document.getId() }) }}">Sterge</a></li>
+                            {% if document.getStatus == 0 %}
+                                <li><a href="{{ path('app_active_document', {'id':document.getId() }) }}">Activeaza</a></li>
+                            {% endif %}
                         </ul>
                     </div>
                 </td>

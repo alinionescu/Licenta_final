@@ -143,5 +143,9 @@ class MeetingLine
         if (!$this->getCreated()) {
             $this->created = new \DateTime();
         }
+
+        if ($this->getModified() === null) {
+            $this->modified = new \DateTime();
+        }
     }
 }
