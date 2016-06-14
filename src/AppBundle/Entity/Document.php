@@ -49,6 +49,12 @@ class Document
     protected $status;
 
     /**
+     * @var bool
+     * @ORM\Column(name="taken", type="boolean", nullable=false)
+     */
+    protected $isTaken = false;
+
+    /**
      * @var \DateTime
      * @ORM\Column(name="created", type="datetime", nullable=true)
      */
@@ -61,7 +67,9 @@ class Document
     protected $modified;
 
     /**
-     * @ORM\ManyToMany(targetEntity="Person", mappedBy="documents")
+     * @var \Doctrine\Common\Collections\Collection
+     * @ORM\ManyToMany(targetEntity="Person", inversedBy="documents")
+     * @ORM\JoinTable(name="person_document")
      */
     protected $persons;
     
@@ -158,20 +166,38 @@ class Document
     }
 
     /**
+     * @return boolean
+     */
+    public function isIsTaken()
+    {
+        return $this->isTaken;
+    }
+
+    /**
+     * @param boolean $isTaken
+     * @return Document
+     */
+    public function setIsTaken($isTaken)
+    {
+        $this->isTaken = $isTaken;
+        return $this;
+    }
+
+    /**
      * @return ArrayCollection
      */
     public function getPersons()
     {
-        return $this->persons;
+        return $this->persons->toArray();
     }
 
     /**
-     * @param mixed $persons
+     * @param Person $person
      * @return Document
      */
-    public function setPersons($persons)
+    public function setPersons(Person $person)
     {
-        $this->persons = $persons;
+        $this->persons[] = $person;
         return $this;
     }
 

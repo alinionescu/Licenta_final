@@ -2,7 +2,8 @@
 
 namespace AppBundle\Service;
 
-use AppBundle\Repository\MeetingsRepository;
+use AppBundle\Entity\Person;
+use AppBundle\Repository\MeetingLineRepository;
 use Doctrine\ORM\EntityManager;
 
 class MeetingService
@@ -22,12 +23,26 @@ class MeetingService
     /**
      * @return array
      */
-    public function getAllMeetings()
+    public function getMeetings(Person $person)
     {
-        /** @var MeetingsRepository $meetingsRepository */
-        $meetingsRepository = $this->entityManager->getRepository('AppBundle:MeetingLine');
+        /** @var MeetingLineRepository $meetingLineRepository */
+        $meetingLineRepository = $this->entityManager->getRepository('AppBundle:MeetingLine');
 
-        $meetings = $meetingsRepository->findAll();
+        $meetings = $meetingLineRepository->getMeetingLines($person);
+
+        return $meetings;
+    }
+
+    /**
+     * @param Person $person
+     * @return array
+     */
+    public function getMeetingsStudent(Person $person)
+    {
+        /** @var MeetingLineRepository $meetingLineRepository */
+        $meetingLineRepository = $this->entityManager->getRepository('AppBundle:MeetingLine');
+
+        $meetings = $meetingLineRepository->getMeetingLinesStudent($person);
 
         return $meetings;
     }

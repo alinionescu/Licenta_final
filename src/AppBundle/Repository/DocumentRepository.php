@@ -2,6 +2,7 @@
 
 namespace AppBundle\Repository;
 
+use AppBundle\Entity\Person;
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\NonUniqueResultException;
 
@@ -23,6 +24,22 @@ class DocumentRepository extends EntityRepository
         } catch (NonUniqueResultException $ex) {
             return null;
         }
+
+        return $result;
+    }
+
+    /**
+     * @param Person $person
+     * @return array
+     */
+    public function getDocuments(Person $person)
+    {
+        $query = $this->createQueryBuilder('d')
+            ->select('d')
+            ->leftJoin('d.persons', 'p')
+            ->where('p.id = :person')->setParameter('person', $person->getId());
+
+        $result = $query->getQuery()->getResult();
 
         return $result;
     }

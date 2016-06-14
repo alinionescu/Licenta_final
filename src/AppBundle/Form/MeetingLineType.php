@@ -24,7 +24,7 @@ class MeetingLineType extends AbstractType
                     'da' => 1,
                     'nu' => 0
                 ]
-            ])->add('persons', 'Symfony\Bridge\Doctrine\Form\Type\EntityType', [
+            ])->add('personMeet', 'Symfony\Bridge\Doctrine\Form\Type\EntityType', [
                 'class' => 'AppBundle\Entity\Person',
                 'query_builder' =>  function (EntityRepository $er) {
                     return $er->createQueryBuilder('p')

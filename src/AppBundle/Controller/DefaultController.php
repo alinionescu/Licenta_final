@@ -51,7 +51,7 @@ class DefaultController extends Controller
         /** @var DocumentService $documentService */
         $documentService = $this->container->get('app_document');
 
-        $documents = $documentService->getAllDocuments();
+        $documents = $documentService->getDocuments($user->getPerson());
 
         return $this->render(':Document:list-document.html.twig', [
             'documents' => $documents,
@@ -85,8 +85,8 @@ class DefaultController extends Controller
             ]);
         }
 
-        $form->handleRequest($request);
         $form->setData($document);
+        $form->handleRequest($request);
 
         if ($form->isValid() && $form->isSubmitted()) {
             $entityManager = $this->container->get('doctrine')->getManager();
@@ -96,11 +96,7 @@ class DefaultController extends Controller
             $entityManager->persist($document);
             $entityManager->flush();
 
-            $this->get('session')->getFlashBag()->add('success', 'Document salvat cu success');
-
-            return $this->render(':Document:add-document.html.twig', [
-                'form' => $form->createView()
-            ]);
+            $this->get('session')->getFlashBag()->add('success', 'Tema de licenta editata cu success');
 
             $url = $this->generateUrl('app_list_document');
 
@@ -122,12 +118,11 @@ class DefaultController extends Controller
     {
         /** @var Document $document */
         $document = new Document();
+
         $form = $this->createForm(DocumentType::class, $document);
         $form->handleRequest($request);
 
         if ($form->isValid() && $form->isSubmitted()) {
-            $entityManager = $this->container->get('doctrine')->getManager();
-
             $document = $form->getData();
 
             /** @var User $user */
@@ -135,12 +130,15 @@ class DefaultController extends Controller
 
             /** @var Person $person */
             $person = $user->getPerson();
-            $document->getPersons()->add($person);
+
+            $document->setPersons($person);
+
+            $entityManager = $this->container->get('doctrine')->getManager();
 
             $entityManager->persist($document);
             $entityManager->flush();
 
-            $this->get('session')->getFlashBag()->add('success', 'Document salvat cu success');
+            $this->get('session')->getFlashBag()->add('success', 'Tema de licenta salvata cu success');
 
             $url = $this->generateUrl('app_list_document');
             return new RedirectResponse($url);
@@ -174,12 +172,12 @@ class DefaultController extends Controller
         /** @var DocumentService $documentService */
         $documentService = $this->container->get('app_document');
 
-        $documents = $documentService->getAllDocuments();
-
         /** @var User $user */
         $user = $this->container->get('security.token_storage')->getToken()->getUser();
 
         $typeId = $user->getPerson()->getPersonType()->getId();
+
+        $documents = $documentService->getDocuments($user->getPerson());
 
         return $this->render(':Document:list-document.html.twig', [
             'documents' => $documents,
@@ -210,34 +208,78 @@ class DefaultController extends Controller
         /** @var DocumentService $documentService */
         $documentService = $this->container->get('app_document');
 
-        $documents = $documentService->getAllDocuments();
-
         /** @var User $user */
         $user = $this->container->get('security.token_storage')->getToken()->getUser();
 
         $typeId = $user->getPerson()->getPersonType()->getId();
+
+        $documents = $documentService->getDocuments($user->getPerson());
 
         return $this->render(':Document:list-document.html.twig', [
             'documents' => $documents,
             'type' => $typeId
         ]);
     }
-    
+
+    /**
+     * @param Request $request
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
     public function listDocumentsForStudentAction(Request $request)
     {
         /** @var DocumentService $documentService */
         $documentService = $this->container->get('app_document');
-
-        $documents = $documentService->getAllDocuments();
 
         /** @var User $user */
         $user = $this->container->get('security.token_storage')->getToken()->getUser();
 
         $typeId = $user->getPerson()->getPersonType()->getId();
 
+        if ($user->getPerson()->getDocument() == null) {
+            $documents = $documentService->getAllDocuments();
+            $hasDocument = false;
+        } else {
+            $hasDocument = true;
+            $documents = [$user->getPerson()->getDocument()];
+            $this->get('session')->getFlashBag()->add('success', 'Tema de licenta a fost aleasa');
+        }
+
         return $this->render(':Document:list-document.html.twig', [
             'documents' => $documents,
-            'type' => $typeId
+            'type' => $typeId,
+            'hasDocument' => $hasDocument
         ]);
+    }
+
+    /**
+     * @param Request $request
+     * @return RedirectResponse
+     */
+    public function addDocumentStudentAction(Request $request)
+    {
+        $documentId = intval($request->get('id'));
+
+        /** @var DocumentRepository $documentRepository */
+        $documentRepository = $this->container->get('doctrine')->getManager()->getRepository('AppBundle:Document');
+
+        /** @var Document $document */
+        $document = $documentRepository->findOneBy(array('id' => $documentId));
+        $document->setIsTaken(Document::STATUS_ENABLE);
+
+        /** @var User $user */
+        $user = $this->container->get('security.token_storage')->getToken()->getUser();
+
+        /** @var Person $person */
+        $person = $user->getPerson();
+        $person->setDocument($document);
+
+        $entityManager = $this->container->get('doctrine')->getManager();
+
+        $entityManager->persist($document);
+        $entityManager->persist($person);
+        $entityManager->flush();
+
+        $url = $this->generateUrl('app_list_document_student');
+        return new RedirectResponse($url);
     }
 }

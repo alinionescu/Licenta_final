@@ -14,9 +14,10 @@
 {% endblock %}
 
 {% block page_content %}
-    <a type="button" class="btn btn-primary" href="{{ path('app_add_meeting')}}">Adauga Intalnire</a>
-    <!-- <button id="add-document" type="button" class="btn btn-primary">Adauga licenta</button> -->
-    <br /><br />
+    {% if type != 3 %}
+        <a type="button" class="btn btn-primary" href="{{ path('app_add_meeting')}}">Adauga Intalnire</a>
+        <br /><br />
+    {% endif %}
 
     {% for flashMessage in app.session.flashbag.get('error') %}
         <div class="alert alert-danger" role="alert">{{ flashMessage }}</div>
@@ -34,31 +35,43 @@
         <thead>
         <tr>
             <th>Crt</th>
+            {% if type != 3 %}
+                <th>Student</th>
+            {% endif %}
             <th>Activitate</th>
             <th>Termen finalizare</th>
             <th>Data finalizarii</th>
-            <th>Actions</th>
+            <th>Semnatura</th>
+            {% if type != 3 %}
+                <th>Actions</th>
+            {% endif %}
         </tr>
         </thead>
         <tbody>
         {% for meeting in meetings %}
             <tr>
                 <td>{{ meeting.getId }}</td>
+                {% if type != 3 %}
+                    <td>{{ meeting.getPersonMeet.getName }}</td>
+                {% endif %}
                 <td>{{ meeting.getActivitate|raw}}</td>
                 <td>{{ meeting.getDeadline()|date }}</td>
                 <td>{{ meeting.getCompletionDate()|date }}</td>
-                <td>
-                    <div class="dropdown" style="float: left; margin-right: 5px">
-                        <button class="btn btn-default dropdown-toggle" type="button" id="promote" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
-                            Actiuni
-                            <span class="caret"></span>
-                        </button>
-                        <ul class="dropdown-menu" aria-labelledby="promote">
-                            <li><a href="{{ path('app_edit_document', {'id':meeting.getId() }) }}">Editeaza</a></li>
-                            <li><a href="{{ path('app_delete_document', {'id':meeting.getId() }) }}">Sterge</a></li>
-                        </ul>
-                    </div>
-                </td>
+                <td>{{ meeting.isSignature() }}</td>
+                {% if type != 3 %}
+                    <td>
+                        <div class="dropdown" style="float: left; margin-right: 5px">
+                            <button class="btn btn-default dropdown-toggle" type="button" id="promote" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+                                Actiuni
+                                <span class="caret"></span>
+                            </button>
+                            <ul class="dropdown-menu" aria-labelledby="promote">
+                                <li><a href="{{ path('app_edit_document', {'id':meeting.getId() }) }}">Editeaza</a></li>
+                                <li><a href="{{ path('app_delete_document', {'id':meeting.getId() }) }}">Sterge</a></li>
+                            </ul>
+                        </div>
+                    </td>
+                {% endif %}
             </tr>
         {% endfor %}
         </tbody>

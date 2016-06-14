@@ -82,3 +82,7 @@ app_active_meeting:
 app_list_document_student:
     defaults: { _controller: "AppBundle:Default:listDocumentsForStudent" }
     path: /list-document-student
+
+app_add_document_student:
+    defaults: { _controller: "AppBundle:Default:addDocumentStudent" }
+    path: /add-document-student

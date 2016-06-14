@@ -37,6 +37,12 @@ class Person
     protected $matricol;
 
     /**
+     * @ORM\ManyToOne(targetEntity="Document")
+     * @ORM\JoinColumn(name="document_id", referencedColumnName="id")
+     */
+    protected $document;
+
+    /**
      * @var PersonType
      * @ORM\ManyToOne(targetEntity="AppBundle\Entity\PersonType", fetch="EXTRA_LAZY")
      * @ORM\JoinColumn(name="person_type_id", referencedColumnName="id")
@@ -86,27 +92,20 @@ class Person
     protected $modified;
 
     /**
-     * @ORM\ManyToMany(targetEntity="AppBundle\Entity\MeetingLine", inversedBy="persons")
+     * @ORM\ManyToMany(targetEntity="AppBundle\Entity\MeetingLine", mappedBy="persons")
      */
     protected $meetingLines;
 
     /**
      * @var ArrayCollection
      *
-     * @ORM\ManyToMany(targetEntity="Document", inversedBy="persons")
-     * @ORM\JoinTable(name="person_document",
-     *   joinColumns={
-     *     @ORM\JoinColumn(name="person_id", referencedColumnName="id")
-     *   },
-     *   inverseJoinColumns={
-     *     @ORM\JoinColumn(name="document_id", referencedColumnName="id")
-     *   }
-     * )
+     * @ORM\ManyToMany(targetEntity="Document", mappedBy="persons")
      */
     protected $documents;
 
     public function __construct() {
         $this->meetingLines = new ArrayCollection();
+        $this->documents = new ArrayCollection();
     }
 
     /**
@@ -330,7 +329,7 @@ class Person
      */
     public function getDocuments()
     {
-        return $this->documents;
+        return $this->documents->toArray();
     }
 
     /**
@@ -339,7 +338,43 @@ class Person
      */
     public function setDocuments($documents)
     {
-        $this->documents = $documents;
+        $this->documents[] = $documents;
+        return $this;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getDocument()
+    {
+        return $this->document;
+    }
+
+    /**
+     * @param mixed $document
+     * @return Person
+     */
+    public function setDocument($document)
+    {
+        $this->document = $document;
+        return $this;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getMeetingLines()
+    {
+        return $this->meetingLines;
+    }
+
+    /**
+     * @param mixed $meetingLines
+     * @return Person
+     */
+    public function setMeetingLines($meetingLines)
+    {
+        $this->meetingLines = $meetingLines;
         return $this;
     }
 

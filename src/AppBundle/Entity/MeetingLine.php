@@ -45,9 +45,17 @@ class MeetingLine
     protected $signature;
 
     /**
-     * @ORM\ManyToMany(targetEntity="AppBundle\Entity\Person", mappedBy="meetingLines")
+     * @var \Doctrine\Common\Collections\Collection
+     * @ORM\ManyToMany(targetEntity="Person", inversedBy="meetingLines")
+     * @ORM\JoinTable(name="person_meeting_line")
      */
     protected $persons;
+
+    /**
+     * @ORM\ManyToOne(targetEntity="Person")
+     * @ORM\JoinColumn(name="person_meet", referencedColumnName="id")
+     */
+    protected $personMeet;
 
     /**
      * @var \DateTime
@@ -142,7 +150,11 @@ class MeetingLine
      */
     public function isSignature()
     {
-        return $this->signature;
+        if ($this->signature) {
+            return "YES";
+        }
+
+        return "NO";
     }
 
     /**
@@ -158,6 +170,24 @@ class MeetingLine
     /**
      * @return Person
      */
+    public function getPersonMeet()
+    {
+        return $this->personMeet;
+    }
+
+    /**
+     * @param Person $personMeet
+     * @return MeetingLine
+     */
+    public function setPersonMeet($personMeet)
+    {
+        $this->personMeet = $personMeet;
+        return $this;
+    }
+
+    /**
+     * @return Person
+     */
     public function getPersons()
     {
         return $this->persons->toArray();
@@ -167,7 +197,7 @@ class MeetingLine
      * @param Person $person
      * @return MeetingLine
      */
-    public function setPersons($person)
+    public function setPersons(Person $person)
     {
         $this->persons[] = $person;
         return $this;

@@ -4,6 +4,9 @@ namespace AppBundle\Controller;
 
 use AppBundle\Entity\MeetingLine;
 use AppBundle\Entity\Meetings;
+use AppBundle\Entity\Person;
+use AppBundle\Entity\PersonType;
+use AppBundle\Entity\User;
 use AppBundle\Form\MeetingLineType;
 use AppBundle\Form\MeetingsType;
 use AppBundle\Service\MeetingService;
@@ -22,10 +25,18 @@ class MeetingController extends Controller
         /** @var MeetingService $meetingService */
         $meetingService = $this->container->get('app_meeting');
 
-        $meetings = $meetingService->getAllMeetings();
+        /** @var User $user */
+        $user = $this->container->get('security.token_storage')->getToken()->getUser();
+
+        if ($user->getPerson()->getPersonType()->getId() !== PersonType::PERSON_TYPE_STUDENT) {
+            $meetings = $meetingService->getMeetings($user->getPerson());
+        } else {
+            $meetings = $meetingService->getMeetingsStudent($user->getPerson());
+        }
 
         return $this->render(':Meeting:list-meeting.html.twig', [
-            'meetings' => $meetings
+            'meetings' => $meetings,
+            'type' => $user->getPerson()->getPersonType()->getId()
         ]);
     }
 
@@ -68,10 +79,6 @@ class MeetingController extends Controller
 
             $this->get('session')->getFlashBag()->add('success', 'Document salvat cu success');
 
-            return $this->render(':Document:add-document.html.twig', [
-                'form' => $form->createView()
-            ]);
-
             $url = $this->generateUrl('app_list_document');
 
             return new RedirectResponse($url);
@@ -90,15 +97,21 @@ class MeetingController extends Controller
      */
     public function addMeetingAction(Request $request)
     {
+        /** @var MeetingLine $meetingLine */
         $meetingLine = new MeetingLine();
         $form = $this->createForm(MeetingLineType::class, $meetingLine);
         $form->handleRequest($request);
 
         if ($form->isValid() && $form->isSubmitted()) {
-            $entityManager = $this->container->get('doctrine')->getManager();
-
             $meetingLine = $form->getData();
 
+            /** @var User $user */
+            $user = $this->container->get('security.token_storage')->getToken()->getUser();
+
+            $person = $user->getPerson();
+            $meetingLine->setPersons($person);
+
+            $entityManager = $this->container->get('doctrine')->getManager();
             $entityManager->persist($meetingLine);
             $entityManager->flush();
 

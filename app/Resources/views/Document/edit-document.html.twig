@@ -32,10 +32,10 @@
         </div>
     </div>
 
-    {{ form_start(form, {'method': 'post', 'action': path('app_edit_document')}) }}
+    {{ form_start(form, {'method': 'post', 'action': path('app_edit_document', {'id':document.getId() })}) }}
     {{ form_widget(form) }}
     <div>
-        <a href="{{ path('app_edit_document', {'id':document.getId() }) }}" type="submit" class="btn btn-primary btn-block btn-flat">Editeaza tema licenta</a>
+        <button type="submit" class="btn btn-primary btn-block btn-flat">Editeaza tema licenta</button>
     </div>
     {{ form_end(form) }}
 {% endblock %}

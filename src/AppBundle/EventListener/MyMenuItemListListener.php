@@ -108,9 +108,11 @@ class MyMenuItemListListener
 
             /** Meniu pentru Student */
             if ($type === PersonType::PERSON_TYPE_STUDENT) {
-                $student = new MenuItemModel('DocumenteLicenta', 'Teme licenta', 'app_list_document', array(/* options */), 'iconclasses fa fa-plane');
+                $student = new MenuItemModel('DocumenteLicenta', 'Teme licenta', 'app_list_document_student', array(/* options */), 'iconclasses fa fa-plane');
+                $student2 = new MenuItemModel('Mettings', 'Intalniri', 'app_list_meeting', array(/* options */), 'iconclasses fa fa-plane');
 
                 array_push($menuItems, $student);
+                array_push($menuItems, $student2);
             }
         } else {
             $login = new MenuItemModel('loginId', 'Login', 'fos_user_security_login', array(/* options */), 'iconclasses fa fa-plane');
