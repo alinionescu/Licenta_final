@@ -3,10 +3,12 @@
 namespace AppBundle\Controller;
 
 use AppBundle\Entity\Document;
+use AppBundle\Entity\Person;
 use AppBundle\Entity\User;
 use AppBundle\Form\DocumentType;
 use AppBundle\Repository\DocumentRepository;
 use AppBundle\Service\DocumentService;
+use Doctrine\Common\Collections\ArrayCollection;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -41,13 +43,19 @@ class DefaultController extends Controller
      */
     public function listDocumentAction()
     {
+        /** @var User $user */
+        $user = $this->container->get('security.token_storage')->getToken()->getUser();
+
+        $typeId = $user->getPerson()->getPersonType()->getId();
+
         /** @var DocumentService $documentService */
         $documentService = $this->container->get('app_document');
 
         $documents = $documentService->getAllDocuments();
 
         return $this->render(':Document:list-document.html.twig', [
-            'documents' => $documents
+            'documents' => $documents,
+            'type' => $typeId
         ]);
     }
 
@@ -112,6 +120,7 @@ class DefaultController extends Controller
      */
     public function addDocumentAction(Request $request)
     {
+        /** @var Document $document */
         $document = new Document();
         $form = $this->createForm(DocumentType::class, $document);
         $form->handleRequest($request);
@@ -120,6 +129,13 @@ class DefaultController extends Controller
             $entityManager = $this->container->get('doctrine')->getManager();
 
             $document = $form->getData();
+
+            /** @var User $user */
+            $user = $this->container->get('security.token_storage')->getToken()->getUser();
+
+            /** @var Person $person */
+            $person = $user->getPerson();
+            $document->getPersons()->add($person);
 
             $entityManager->persist($document);
             $entityManager->flush();
@@ -160,8 +176,14 @@ class DefaultController extends Controller
 
         $documents = $documentService->getAllDocuments();
 
+        /** @var User $user */
+        $user = $this->container->get('security.token_storage')->getToken()->getUser();
+
+        $typeId = $user->getPerson()->getPersonType()->getId();
+
         return $this->render(':Document:list-document.html.twig', [
-            'documents' => $documents
+            'documents' => $documents,
+            'type' => $typeId
         ]);
     }
 
@@ -190,13 +212,32 @@ class DefaultController extends Controller
 
         $documents = $documentService->getAllDocuments();
 
+        /** @var User $user */
+        $user = $this->container->get('security.token_storage')->getToken()->getUser();
+
+        $typeId = $user->getPerson()->getPersonType()->getId();
+
         return $this->render(':Document:list-document.html.twig', [
-            'documents' => $documents
+            'documents' => $documents,
+            'type' => $typeId
         ]);
     }
     
-    public function listMettings(Request $request)
+    public function listDocumentsForStudentAction(Request $request)
     {
-        
+        /** @var DocumentService $documentService */
+        $documentService = $this->container->get('app_document');
+
+        $documents = $documentService->getAllDocuments();
+
+        /** @var User $user */
+        $user = $this->container->get('security.token_storage')->getToken()->getUser();
+
+        $typeId = $user->getPerson()->getPersonType()->getId();
+
+        return $this->render(':Document:list-document.html.twig', [
+            'documents' => $documents,
+            'type' => $typeId
+        ]);
     }
 }

@@ -18,6 +18,10 @@ use Symfony\Component\HttpFoundation\Request;
 
 class RegistrationController extends BaseController
 {
+    /**
+     * @param Request $request
+     * @return null|RedirectResponse|\Symfony\Component\HttpFoundation\Response
+     */
     public function registerAction(Request $request)
     {
         /** @var $formFactory \FOS\UserBundle\Form\Factory\FactoryInterface */
@@ -49,7 +53,7 @@ class RegistrationController extends BaseController
             $userManager->updateUser($user);
 
             if (null === $response = $event->getResponse()) {
-                $url = $this->generateUrl('homepage');
+                $url = $this->generateUrl('app_registration');
                 $response = new RedirectResponse($url);
             }
 

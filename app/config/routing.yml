@@ -6,9 +6,9 @@ admin_add_user:
     defaults: { _controller: "AppBundle:Admin:addUser" }
     path: /add
 
-admin_promote_user_list:
-    defaults: { _controller: "AppBundle:Admin:promoteUserList" }
-    path: /promote-user-list
+admin_user_list:
+    defaults: { _controller: "AppBundle:Admin:userList" }
+    path: /user-list
     
 admin_promote_user:
     defaults: { _controller: "AppBundle:Admin:promoteUser", id: 0 ,role: "ROLE_USER" }
@@ -56,3 +56,29 @@ app_delete_document:
 app_active_document:
     defaults: { _controller: "AppBundle:Default:activeDocument" }
     path: /active-document
+
+# intalniri
+
+app_list_meeting:
+    defaults: { _controller: "AppBundle:Meeting:listMeetings" }
+    path: /list-meetings
+
+app_edit_meeting:
+    defaults: { _controller: "AppBundle:Meeting:editMeeting", id: 0 }
+    path: /edit-meeting/{id}
+
+app_add_meeting:
+    defaults: { _controller: "AppBundle:Meeting:addMeeting" }
+    path: /add-meeting
+
+app_delete_meeting:
+    defaults: { _controller: "AppBundle:Meeting:deleteMeeting" }
+    path: /delete-meeting
+
+app_active_meeting:
+    defaults: { _controller: "AppBundle:Meeting:activeMeeting" }
+    path: /active-meeting
+
+app_list_document_student:
+    defaults: { _controller: "AppBundle:Default:listDocumentsForStudent" }
+    path: /list-document-student

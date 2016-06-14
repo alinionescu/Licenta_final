@@ -5,7 +5,7 @@ namespace AppBundle\Entity;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
- * @ORM\Entity
+ * @ORM\Entity(repositoryClass="AppBundle\Repository\PersonTypeRepository")
  * @ORM\Table(name="person_type")
  * @ORM\HasLifecycleCallbacks()
  */
@@ -112,6 +112,10 @@ class PersonType
     {
         if (!$this->getCreated()) {
             $this->created = new \DateTime();
+        }
+
+        if ($this->getModified() === null) {
+            $this->modified = new \DateTime();
         }
     }
 }

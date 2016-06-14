@@ -2,12 +2,14 @@
 
 namespace AppBundle\Entity;
 
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
+use AppBundle\Entity\Document;
 use Doctrine\ORM\Mapping\JoinTable;
-use Doctrine\ORM\Mapping\JoinColumn;
+use Doctrine\ORM\Mapping\ManyToMany;
 
 /**
- * @ORM\Entity
+ * @ORM\Entity(repositoryClass="AppBundle\Repository\PersonRepository")
  * @ORM\Table(name="person")
  * @ORM\HasLifecycleCallbacks()
  */
@@ -84,18 +86,28 @@ class Person
     protected $modified;
 
     /**
-     * @ORM\ManyToMany(targetEntity="AppBundle\Entity\Meetings", cascade={"persist"}, inversedBy="persons")
+     * @ORM\ManyToMany(targetEntity="AppBundle\Entity\MeetingLine", inversedBy="persons")
      */
-    protected $meetings;
+    protected $meetingLines;
 
     /**
-     * @ORM\ManyToMany(targetEntity="AppBundle\Entity\Document", cascade={"persist"}, inversedBy="persons")
-     * @JoinTable(name="person_document",
-     *     joinColumns={@JoinColumn(name="person_id", referencedColumnName="id")},
-     *     inverseJoinColumns={@JoinColumn(name="document_id", referencedColumnName="id")}
-     *     )
+     * @var ArrayCollection
+     *
+     * @ORM\ManyToMany(targetEntity="Document", inversedBy="persons")
+     * @ORM\JoinTable(name="person_document",
+     *   joinColumns={
+     *     @ORM\JoinColumn(name="person_id", referencedColumnName="id")
+     *   },
+     *   inverseJoinColumns={
+     *     @ORM\JoinColumn(name="document_id", referencedColumnName="id")
+     *   }
+     * )
      */
     protected $documents;
+
+    public function __construct() {
+        $this->meetingLines = new ArrayCollection();
+    }
 
     /**
      * @return int
@@ -148,24 +160,6 @@ class Person
     public function setMatricol($matricol)
     {
         $this->matricol = $matricol;
-        return $this;
-    }
-
-    /**
-     * @return Document
-     */
-    public function getDocument()
-    {
-        return $this->document;
-    }
-
-    /**
-     * @param Document $document
-     * @return Person
-     */
-    public function setDocument($document)
-    {
-        $this->document = $document;
         return $this;
     }
 
@@ -314,6 +308,65 @@ class Person
     }
 
     /**
+     * @return mixed
+     */
+    public function getMeetingLine()
+    {
+        return $this->meetingLines->toArray();
+    }
+
+    /**
+     * @param mixed $meetingLine
+     * @return Person
+     */
+    public function setMeetingLine($meetingLine)
+    {
+        $this->meetingLine = $meetingLine;
+        return $this;
+    }
+
+    /**
+     * @return ArrayCollection
+     */
+    public function getDocuments()
+    {
+        return $this->documents;
+    }
+
+    /**
+     * @param ArrayCollection $documents
+     * @return Person
+     */
+    public function setDocuments($documents)
+    {
+        $this->documents = $documents;
+        return $this;
+    }
+
+    /**
+     * Add meetingLine
+     *
+     * @param MeetingLine $meetingLine
+     * @return Person
+     */
+    public function addMeetingLine(MeetingLine $meetingLine)
+    {
+        $this->meetingLines[] = $meetingLine;
+
+        return $this;
+    }
+
+    /**
+     * Remove meetingLine
+     *
+     * @param MeetingLine $meetingLine
+     */
+    public function removeMeetingLine(MeetingLine $meetingLine)
+    {
+        $this->meetingLines->removeElement($meetingLine);
+    }
+
+    /**
      * @ORM\PrePersist
      */
     public function prePersist()
@@ -325,5 +378,10 @@ class Person
         if ($this->getModified() === null) {
             $this->modified = new \DateTime();
         }
+    }
+
+    public function getName()
+    {
+        return $this->firstName . " " .$this->lastName;
     }
 }

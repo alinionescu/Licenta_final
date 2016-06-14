@@ -2,10 +2,11 @@
 
 namespace AppBundle\Entity;
 
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
- * @ORM\Entity
+ * @ORM\Entity(repositoryClass="AppBundle\Repository\MeetingLineRepository")
  * @ORM\Table(name="meeting_lines")
  * @ORM\HasLifecycleCallbacks()
  */
@@ -20,18 +21,33 @@ class MeetingLine
     protected $id;
 
     /**
-     * @var \DateTime
-     * @ORM\Column(name="date_meet", type="datetime", nullable=true)
+     * @var string
+     * @ORM\Column(name="activitate", type="string", nullable=false)
      */
-    protected $dateMeet;
+    protected $activitate;
 
     /**
-     * @var Meetings
-     *
-     * @ORM\ManyToOne(targetEntity="AppBundle\Entity\Meetings", inversedBy="meetingLine", fetch="EXTRA_LAZY")
-     * @ORM\JoinColumn(name="meeting", referencedColumnName="id")
+     * @var \DateTime
+     * @ORM\Column(name="deadline", type="datetime", nullable=false)
      */
-    protected $meeting;
+    protected $deadline;
+
+    /**
+     * @var \DateTime
+     * @ORM\Column(name="completion_date", type="datetime", nullable=false)
+     */
+    protected $completionDate;
+
+    /**
+     * @var boolean
+     * @ORM\Column(name="signature", type="boolean", nullable=true)
+     */
+    protected $signature;
+
+    /**
+     * @ORM\ManyToMany(targetEntity="AppBundle\Entity\Person", mappedBy="meetingLines")
+     */
+    protected $persons;
 
     /**
      * @var \DateTime
@@ -44,6 +60,10 @@ class MeetingLine
      * @ORM\Column(name="modified", type="datetime", nullable=true)
      */
     protected $modified;
+
+    public function __construct() {
+        $this->persons = new ArrayCollection();
+    }
 
     /**
      * @return int
@@ -64,38 +84,92 @@ class MeetingLine
     }
 
     /**
-     * @return \DateTime
+     * @return string
      */
-    public function getDateMeet()
+    public function getActivitate()
     {
-        return $this->dateMeet;
+        return $this->activitate;
     }
 
     /**
-     * @param \DateTime $dateMeet
+     * @param string $activitate
      * @return MeetingLine
      */
-    public function setDateMeet($dateMeet)
+    public function setActivitate($activitate)
     {
-        $this->dateMeet = $dateMeet;
+        $this->activitate = $activitate;
         return $this;
     }
 
     /**
-     * @return Meetings
+     * @return \DateTime
      */
-    public function getMeetings()
+    public function getDeadline()
     {
-        return $this->meetings;
+        return $this->deadline;
     }
 
     /**
-     * @param Meetings $meetings
+     * @param \DateTime $deadline
      * @return MeetingLine
      */
-    public function setMeetings($meetings)
+    public function setDeadline($deadline)
     {
-        $this->meetings = $meetings;
+        $this->deadline = $deadline;
+        return $this;
+    }
+
+    /**
+     * @return \DateTime
+     */
+    public function getCompletionDate()
+    {
+        return $this->completionDate;
+    }
+
+    /**
+     * @param \DateTime $completionDate
+     * @return MeetingLine
+     */
+    public function setCompletionDate($completionDate)
+    {
+        $this->completionDate = $completionDate;
+        return $this;
+    }
+
+    /**
+     * @return boolean
+     */
+    public function isSignature()
+    {
+        return $this->signature;
+    }
+
+    /**
+     * @param boolean $signature
+     * @return MeetingLine
+     */
+    public function setSignature($signature)
+    {
+        $this->signature = $signature;
+        return $this;
+    }
+
+    /**
+     * @return Person
+     */
+    public function getPersons()
+    {
+        return $this->persons->toArray();
+    }
+
+    /**
+     * @param Person $person
+     * @return MeetingLine
+     */
+    public function setPersons($person)
+    {
+        $this->persons[] = $person;
         return $this;
     }
 
@@ -133,6 +207,29 @@ class MeetingLine
     {
         $this->modified = $modified;
         return $this;
+    }
+
+    /**
+     * Add person
+     *
+     * @param Person $person
+     * @return MeetingLine
+     */
+    public function addMeetingLine(Person $person)
+    {
+        $this->persons[] = $person;
+
+        return $this;
+    }
+
+    /**
+     * Remove person
+     *
+     * @param Person $person
+     */
+    public function removeMeetingLine(Person $person)
+    {
+        $this->persons->removeElement($person);
     }
 
     /**

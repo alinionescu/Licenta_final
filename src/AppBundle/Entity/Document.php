@@ -2,10 +2,12 @@
 
 namespace AppBundle\Entity;
 
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
+use AppBundle\Entity\Person;
 
 /**
- * @ORM\Entity
+ * @ORM\Entity(repositoryClass="AppBundle\Repository\DocumentRepository")
  * @ORM\Table(name="document")
  * @ORM\HasLifecycleCallbacks()
  */
@@ -47,11 +49,6 @@ class Document
     protected $status;
 
     /**
-     * @ORM\ManyToMany(targetEntity="AppBundle\Entity\Person", cascade={"persist"}, mappedBy="documents")
-     */
-    protected $persons;
-
-    /**
      * @var \DateTime
      * @ORM\Column(name="created", type="datetime", nullable=true)
      */
@@ -62,6 +59,15 @@ class Document
      * @ORM\Column(name="modified", type="datetime", nullable=true)
      */
     protected $modified;
+
+    /**
+     * @ORM\ManyToMany(targetEntity="Person", mappedBy="documents")
+     */
+    protected $persons;
+    
+    public function __construct() {
+        $this->persons = new ArrayCollection();
+    }
 
     /**
      * @return int
@@ -152,20 +158,20 @@ class Document
     }
 
     /**
-     * @return Student
+     * @return ArrayCollection
      */
-    public function getStudent()
+    public function getPersons()
     {
-        return $this->student;
+        return $this->persons;
     }
 
     /**
-     * @param Student $student
+     * @param mixed $persons
      * @return Document
      */
-    public function setStudent($student)
+    public function setPersons($persons)
     {
-        $this->student = $student;
+        $this->persons = $persons;
         return $this;
     }
 

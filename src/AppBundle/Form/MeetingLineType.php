@@ -2,6 +2,8 @@
 
 namespace AppBundle\Form;
 
+
+use Doctrine\ORM\EntityRepository;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
@@ -14,21 +16,33 @@ class MeetingLineType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $builder
-            ->add('dateMeet', 'datetime')
-            ->add('created', 'datetime')
-            ->add('modified', 'datetime')
-            ->add('meetings')
-        ;
+        $builder->add('activitate', 'Symfony\Component\Form\Extension\Core\Type\TextType')
+            ->add('deadline', 'Symfony\Component\Form\Extension\Core\Type\DateType')
+            ->add('completionDate', 'Symfony\Component\Form\Extension\Core\Type\DateType')
+            ->add('signature', 'Symfony\Component\Form\Extension\Core\Type\ChoiceType', [
+                'choices' => [
+                    'da' => 1,
+                    'nu' => 0
+                ]
+            ])->add('persons', 'Symfony\Bridge\Doctrine\Form\Type\EntityType', [
+                'class' => 'AppBundle\Entity\Person',
+                'query_builder' =>  function (EntityRepository $er) {
+                    return $er->createQueryBuilder('p')
+                        ->orderBy('p.id', 'ASC');
+                },
+                'choice_label' => 'name'
+            ]);
     }
-    
+
     /**
      * @param OptionsResolver $resolver
      */
     public function configureOptions(OptionsResolver $resolver)
     {
-        $resolver->setDefaults(array(
-            'data_class' => 'AppBundle\Entity\MeetingLine'
-        ));
+        $resolver->setDefaults(
+            [
+                'data_class' => 'AppBundle\Entity\MeetingLine'
+            ]
+        );
     }
 }

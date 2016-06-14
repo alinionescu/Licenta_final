@@ -33,7 +33,7 @@ class AdminController extends Controller
     /**
      * @return RedirectResponse|\Symfony\Component\HttpFoundation\Response
      */
-    public function promoteUserListAction()
+    public function userListAction()
     {
         /** @var AuthorizationChecker $authorizationChecker */
         $authorizationChecker = $this->container->get('security.authorization_checker');
@@ -75,8 +75,6 @@ class AdminController extends Controller
      */
     public function promoteUserAction(Request $request)
     {
-
-
         $role = $request->get('role');
         $userId = $request->get('id');
 

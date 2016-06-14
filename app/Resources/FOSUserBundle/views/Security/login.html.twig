@@ -10,10 +10,10 @@
 
     <div class="login-box">
         <div class="login-logo">
-            <a href="../../index2.html"><b>Admin</b>LTE</a>
+            <b>Licenta</b>
         </div><!-- /.login-logo -->
         <div class="login-box-body">
-            <p class="login-box-msg">Sign in to start your session</p>
+            <p class="login-box-msg">Log in</p>
             <form action="{{ path("fos_user_security_check") }}" method="post">
                 <input type="hidden" name="_csrf_token" value="{{ csrf_token }}" />
                 <div class="form-group has-feedback">
@@ -38,10 +38,6 @@
                     </div><!-- /.col -->
                 </div>
             </form>
-
-            <a href="#">I forgot my password</a><br>
-            <!-- <a href="{{ path('app_registration') }}" class="text-center">Register a new membership</a> -->
-
         </div><!-- /.login-box-body -->
     </div>
     {% endblock fos_user_content %}

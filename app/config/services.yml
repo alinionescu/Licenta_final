@@ -7,6 +7,9 @@ parameters:
     app_document.class: AppBundle\Service\DocumentService
     app_document_type.class: AppBundle\Form\DocumentType
 
+    app_meeting.class: AppBundle\Service\MeetingService
+    app_meeting_type.class: AppBundle\Form\MeetingsType
+
 services:
     my_admin_bundle.show_user_listener:
         class: %my_admin_bundle.show_user_listener.class%
@@ -32,3 +35,10 @@ services:
 
     app_document_type:
         class: %app_document_type.class%
+
+    app_meeting:
+        class: %app_meeting.class%
+        arguments: [ '@doctrine.orm.entity_manager' ]
+
+    app_meeting_type:
+        class: %app_meeting_type.class%
