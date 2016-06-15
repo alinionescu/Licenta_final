@@ -8,6 +8,7 @@ use AppBundle\Entity\User;
 use AppBundle\Form\DocumentType;
 use AppBundle\Repository\DocumentRepository;
 use AppBundle\Service\DocumentService;
+use AppBundle\Service\SecurityService;
 use Doctrine\Common\Collections\ArrayCollection;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
@@ -65,6 +66,13 @@ class DefaultController extends Controller
      */
     public function editDocumentAction(Request $request)
     {
+        /** @var SecurityService $securityService */
+        $securityService = $this->container->get('app_security');
+
+        if (!$securityService->isProfesor()) {
+            return $this->render(':admin:accessDenied.html.twig');
+        }
+
         $documentId = intval($request->get('id'));
 
         /** @var DocumentRepository $documentRepository */
@@ -79,9 +87,15 @@ class DefaultController extends Controller
 
             $documents = $documentRepository->findAll();
 
+            /** @var User $user */
+            $user = $this->container->get('security.token_storage')->getToken()->getUser();
+
+            $typeId = $user->getPerson()->getPersonType()->getId();
+
             return $this->render(':Document:list-document.html.twig', [
                 'documents' => $documents,
-                'form' => $form->createView()
+                'form' => $form->createView(),
+                'type' => $typeId
             ]);
         }
 
@@ -104,7 +118,6 @@ class DefaultController extends Controller
         }
 
         return $this->render(':Document:edit-document.html.twig', [
-            'documents' => [],
             'document' => $document,
             'form' => $form->createView()
         ]);
@@ -116,6 +129,13 @@ class DefaultController extends Controller
      */
     public function addDocumentAction(Request $request)
     {
+        /** @var SecurityService $securityService */
+        $securityService = $this->container->get('app_security');
+
+        if (!$securityService->isProfesor()) {
+            return $this->render(':admin:accessDenied.html.twig');
+        }
+
         /** @var Document $document */
         $document = new Document();
 
@@ -155,6 +175,13 @@ class DefaultController extends Controller
      */
     public function deleteDocumentAction(Request $request)
     {
+        /** @var SecurityService $securityService */
+        $securityService = $this->container->get('app_security');
+
+        if (!$securityService->isProfesor()) {
+            return $this->render(':admin:accessDenied.html.twig');
+        }
+
         $documentId = intval($request->get('id'));
 
         /** @var DocumentRepository $documentRepository */
@@ -191,6 +218,13 @@ class DefaultController extends Controller
      */
     public function activeDocumentAction(Request $request)
     {
+        /** @var SecurityService $securityService */
+        $securityService = $this->container->get('app_security');
+
+        if (!$securityService->isProfesor()) {
+            return $this->render(':admin:accessDenied.html.twig');
+        }
+
         $documentId = intval($request->get('id'));
 
         /** @var DocumentRepository $documentRepository */

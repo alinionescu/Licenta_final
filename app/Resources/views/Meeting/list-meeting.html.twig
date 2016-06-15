@@ -49,7 +49,7 @@
         </thead>
         <tbody>
         {% for meeting in meetings %}
-            <tr>
+            <tr {% if meeting.isStatus() == 0 %}  class="alert-danger" {% endif %}>
                 <td>{{ meeting.getId }}</td>
                 {% if type != 3 %}
                     <td>{{ meeting.getPersonMeet.getName }}</td>
@@ -66,8 +66,12 @@
                                 <span class="caret"></span>
                             </button>
                             <ul class="dropdown-menu" aria-labelledby="promote">
-                                <li><a href="{{ path('app_edit_document', {'id':meeting.getId() }) }}">Editeaza</a></li>
-                                <li><a href="{{ path('app_delete_document', {'id':meeting.getId() }) }}">Sterge</a></li>
+                                <li><a href="{{ path('app_edit_meeting', {'id':meeting.getId() }) }}">Editeaza</a></li>
+                                {% if meeting.isStatus() == 0 %}
+                                    <li><a href="{{ path('app_active_meeting', {'id':meeting.getId() }) }}">Activeaza</a></li>
+                                {% else %}
+                                    <li><a href="{{ path('app_delete_meeting', {'id':meeting.getId() }) }}">Sterge</a></li>
+                                {% endif %}
                             </ul>
                         </div>
                     </td>

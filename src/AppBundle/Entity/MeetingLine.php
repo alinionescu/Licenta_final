@@ -12,6 +12,9 @@ use Doctrine\ORM\Mapping as ORM;
  */
 class MeetingLine
 {
+    const STATUS_ENABLE = 1;
+    const STATUS_DISABLE = 0;
+
     /**
      * @var integer
      * @ORM\Id
@@ -56,6 +59,12 @@ class MeetingLine
      * @ORM\JoinColumn(name="person_meet", referencedColumnName="id")
      */
     protected $personMeet;
+
+    /**
+     * @var boolean
+     * @ORM\Column(name="status", type="boolean", nullable=true)
+     */
+    protected $status;
 
     /**
      * @var \DateTime
@@ -200,6 +209,24 @@ class MeetingLine
     public function setPersons(Person $person)
     {
         $this->persons[] = $person;
+        return $this;
+    }
+
+    /**
+     * @return boolean
+     */
+    public function isStatus()
+    {
+        return $this->status;
+    }
+
+    /**
+     * @param boolean $status
+     * @return MeetingLine
+     */
+    public function setStatus($status)
+    {
+        $this->status = $status;
         return $this;
     }
 

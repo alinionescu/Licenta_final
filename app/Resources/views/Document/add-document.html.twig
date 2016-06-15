@@ -15,7 +15,6 @@
 
 {% block page_content %}
     <a type="button" class="btn btn-primary" href="{{ path('app_list_document')}}">List licente</a>
-    <!-- <button id="add-document" type="button" class="btn btn-primary">Adauga licenta</button> -->
     <br /><br />
 
     {% for flashMessage in app.session.flashbag.get('error') %}

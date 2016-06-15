@@ -8,7 +8,9 @@ parameters:
     app_document_type.class: AppBundle\Form\DocumentType
 
     app_meeting.class: AppBundle\Service\MeetingService
-    app_meeting_type.class: AppBundle\Form\MeetingsType
+    app_meeting_type.class: AppBundle\Form\MeetingLineType
+
+    app_security.class: AppBundle\Service\SecurityService
 
 services:
     my_admin_bundle.show_user_listener:
@@ -42,3 +44,7 @@ services:
 
     app_meeting_type:
         class: %app_meeting_type.class%
+
+    app_security:
+        class: %app_security.class%
+        arguments: [ '@security.token_storage', '@security.authorization_checker' ]

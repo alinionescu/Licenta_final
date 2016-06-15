@@ -12,6 +12,7 @@ use AppBundle\Entity\Person;
 use AppBundle\Entity\User;
 use AppBundle\Form\PersonType;
 use AppBundle\Repository\UserRepository;
+use AppBundle\Service\SecurityService;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;
@@ -23,10 +24,17 @@ use Symfony\Component\Security\Core\Authorization\AuthorizationChecker;
 class AdminController extends Controller
 {
     /**
-     * @return type
+     * @return RedirectResponse|\Symfony\Component\HttpFoundation\Response
      */
     public function addUserAction()
     {
+        /** @var SecurityService $securityService */
+        $securityService = $this->container->get('app_security');
+
+        if (!$securityService->isAdmin()) {
+            return $this->render(':admin:accessDenied.html.twig');
+        }
+
         return $this->redirectToRoute('app_registration');
     }
 
@@ -35,38 +43,24 @@ class AdminController extends Controller
      */
     public function userListAction()
     {
-        /** @var AuthorizationChecker $authorizationChecker */
-        $authorizationChecker = $this->container->get('security.authorization_checker');
+        /** @var SecurityService $securityService */
+        $securityService = $this->container->get('app_security');
 
-        if ($authorizationChecker->isGranted('IS_AUTHENTICATED_FULLY')) {
-            /** @var TokenStorage $tokenStorage */
-            $tokenStorage = $this->container->get('security.token_storage');
-
-            /** @var User $user */
-            $user = $tokenStorage->getToken()->getUser();
-
-            $type = $user->getPerson()->getPersonType()->getId();
-            if ($type !== \AppBundle\Entity\PersonType::PERSON_TYPE_ADMIN) {
-                return $this->render(':admin:accessDenied.html.twig');
-            }
-
-            /** @var UserRepository $userRepository */
-            $userRepository = $this->container->get('doctrine')->getManager()->getRepository('AppBundle:User');
-
-            $users = $userRepository->findAll();
-
-            return $this->render(':admin:listUser.html.twig',
-                array(
-                    'messages' => "",
-                    'users' => $users
-                )
-            );
+        if (!$securityService->isAdmin()) {
+            return $this->render(':admin:accessDenied.html.twig');
         }
 
-        $url = $this->generateUrl('fos_user_security_login');
-        $response = new RedirectResponse($url);
+        /** @var UserRepository $userRepository */
+        $userRepository = $this->container->get('doctrine')->getManager()->getRepository('AppBundle:User');
 
-        return $response;
+        $users = $userRepository->findAll();
+
+        return $this->render(':admin:listUser.html.twig',
+            array(
+                'messages' => "",
+                'users' => $users
+            )
+        );
     }
 
     /**
@@ -75,6 +69,13 @@ class AdminController extends Controller
      */
     public function promoteUserAction(Request $request)
     {
+        /** @var SecurityService $securityService */
+        $securityService = $this->container->get('app_security');
+
+        if (!$securityService->isAdmin()) {
+            return $this->render(':admin:accessDenied.html.twig');
+        }
+
         $role = $request->get('role');
         $userId = $request->get('id');
 
@@ -116,6 +117,13 @@ class AdminController extends Controller
      */
     public function demoteUserAction(Request $request)
     {
+        /** @var SecurityService $securityService */
+        $securityService = $this->container->get('app_security');
+
+        if (!$securityService->isAdmin()) {
+            return $this->render(':admin:accessDenied.html.twig');
+        }
+
         /** @var AuthorizationChecker $authorizationChecker */
         $authorizationChecker = $this->container->get('security.authorization_checker');
         if (!$authorizationChecker->isGranted('IS_AUTHENTICATED_FULLY')) {
@@ -148,10 +156,5 @@ class AdminController extends Controller
                 'users' => $users
             )
         );
-    }
-
-    public function editUserAction(Request $request)
-    {
-
     }
 }

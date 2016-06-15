@@ -3,6 +3,7 @@
 namespace AppBundle\Form;
 
 
+use AppBundle\Entity\PersonType;
 use Doctrine\ORM\EntityRepository;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -28,6 +29,7 @@ class MeetingLineType extends AbstractType
                 'class' => 'AppBundle\Entity\Person',
                 'query_builder' =>  function (EntityRepository $er) {
                     return $er->createQueryBuilder('p')
+                        ->where('p.personType = :personType')->setParameter('personType', PersonType::PERSON_TYPE_STUDENT)
                         ->orderBy('p.id', 'ASC');
                 },
                 'choice_label' => 'name'

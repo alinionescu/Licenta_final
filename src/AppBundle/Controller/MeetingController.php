@@ -9,7 +9,9 @@ use AppBundle\Entity\PersonType;
 use AppBundle\Entity\User;
 use AppBundle\Form\MeetingLineType;
 use AppBundle\Form\MeetingsType;
+use AppBundle\Repository\MeetingLineRepository;
 use AppBundle\Service\MeetingService;
+use AppBundle\Service\SecurityService;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;
@@ -46,47 +48,57 @@ class MeetingController extends Controller
      */
     public function editMeetingAction(Request $request)
     {
-        $documentId = intval($request->get('id'));
+        /** @var SecurityService $securityService */
+        $securityService = $this->container->get('app_security');
 
-        /** @var DocumentRepository $documentRepository */
-        $documentRepository = $this->container->get('doctrine')->getManager()->getRepository('AppBundle:Document');
+        if (!$securityService->isProfesor()) {
+            return $this->render(':admin:accessDenied.html.twig');
+        }
 
-        $document = $documentRepository->findOneBy(array('id' => $documentId));
+        $meetingLineId = intval($request->get('id'));
 
-        $form = $this->createForm(DocumentType::class, $document);
+        /** @var MeetingLineRepository $meetingLineRepository */
+        $meetingLineRepository = $this->container->get('doctrine')->getManager()->getRepository('AppBundle:MeetingLine');
 
-        if (null === $document) {
-            $this->get('session')->getFlashBag()->add('error', 'No Document Found');
+        $meetingLine = $meetingLineRepository->findOneBy(array('id' => $meetingLineId));
 
-            $documents = $documentRepository->findAll();
+        $form = $this->createForm(MeetingLineType::class, $meetingLine);
 
-            return $this->render(':Document:list-document.html.twig', [
-                'documents' => $documents,
-                'form' => $form->createView()
+        if (null === $meetingLine) {
+            $this->get('session')->getFlashBag()->add('error', 'No MeetingLine Found');
+
+            $meetingLines = $meetingLineRepository->findAll();
+
+            /** @var User $user */
+            $user = $this->container->get('security.token_storage')->getToken()->getUser();
+
+            return $this->render(':Meeting:list-meeting.html.twig', [
+                'meetings' => $meetingLines,
+                'form' => $form->createView(),
+                'type' => $user->getPerson()->getPersonType()->getId()
             ]);
         }
 
         $form->handleRequest($request);
-        $form->setData($document);
+        $form->setData($meetingLine);
 
         if ($form->isValid() && $form->isSubmitted()) {
             $entityManager = $this->container->get('doctrine')->getManager();
 
-            $document = $form->getData();
+            $meetingLine = $form->getData();
 
-            $entityManager->persist($document);
+            $entityManager->persist($meetingLine);
             $entityManager->flush();
 
-            $this->get('session')->getFlashBag()->add('success', 'Document salvat cu success');
+            $this->get('session')->getFlashBag()->add('success', 'Intalnire editata cu success');
 
-            $url = $this->generateUrl('app_list_document');
+            $url = $this->generateUrl('app_list_meeting');
 
             return new RedirectResponse($url);
         }
 
-        return $this->render(':Document:edit-document.html.twig', [
-            'documents' => [],
-            'document' => $document,
+        return $this->render(':Meeting:edit-meeting.html.twig', [
+            'meeting' => $meetingLine,
             'form' => $form->createView()
         ]);
     }
@@ -97,8 +109,16 @@ class MeetingController extends Controller
      */
     public function addMeetingAction(Request $request)
     {
+        /** @var SecurityService $securityService */
+        $securityService = $this->container->get('app_security');
+
+        if (!$securityService->isProfesor()) {
+            return $this->render(':admin:accessDenied.html.twig');
+        }
+
         /** @var MeetingLine $meetingLine */
         $meetingLine = new MeetingLine();
+
         $form = $this->createForm(MeetingLineType::class, $meetingLine);
         $form->handleRequest($request);
 
@@ -132,27 +152,41 @@ class MeetingController extends Controller
      */
     public function deleteMeetingAction(Request $request)
     {
-        $documentId = intval($request->get('id'));
+        /** @var SecurityService $securityService */
+        $securityService = $this->container->get('app_security');
 
-        /** @var DocumentRepository $documentRepository */
-        $documentRepository = $this->container->get('doctrine')->getManager()->getRepository('AppBundle:Document');
+        if (!$securityService->isProfesor()) {
+            return $this->render(':admin:accessDenied.html.twig');
+        }
 
-        /** @var Document $document */
-        $document = $documentRepository->findOneBy(array('id' => $documentId));
+        $meetingLineId = intval($request->get('id'));
 
-        $document->setStatus(Document::STATUS_DISABLE);
+        /** @var MeetingLineRepository $meetingLineRepository */
+        $meetingLineRepository = $this->container->get('doctrine')->getManager()->getRepository('AppBundle:MeetingLine');
+
+        /** @var MeetingLine $meetingLine */
+        $meetingLine = $meetingLineRepository->findOneBy(array('id' => $meetingLineId));
+
+        $meetingLine->setStatus(MeetingLine::STATUS_DISABLE);
 
         $entityManager = $this->container->get('doctrine')->getManager();
-        $entityManager->persist($document);
+        $entityManager->persist($meetingLine);
         $entityManager->flush();
 
-        /** @var DocumentService $documentService */
-        $documentService = $this->container->get('app_document');
+        /** @var MeetingService $meetingService */
+        $meetingService = $this->container->get('app_meeting');
 
-        $documents = $documentService->getAllDocuments();
+        /** @var User $user */
+        $user = $this->container->get('security.token_storage')->getToken()->getUser();
 
-        return $this->render(':Document:list-document.html.twig', [
-            'documents' => $documents
+        $meetings = $meetingService->getMeetings($user->getPerson());
+
+        /** @var User $user */
+        $user = $this->container->get('security.token_storage')->getToken()->getUser();
+
+        return $this->render(':Meeting:list-meeting.html.twig', [
+            'meetings' => $meetings,
+            'type' => $user->getPerson()->getPersonType()->getId()
         ]);
     }
 
@@ -162,27 +196,41 @@ class MeetingController extends Controller
      */
     public function activeMeetingAction(Request $request)
     {
-        $documentId = intval($request->get('id'));
+        /** @var SecurityService $securityService */
+        $securityService = $this->container->get('app_security');
 
-        /** @var DocumentRepository $documentRepository */
-        $documentRepository = $this->container->get('doctrine')->getManager()->getRepository('AppBundle:Document');
+        if (!$securityService->isProfesor()) {
+            return $this->render(':admin:accessDenied.html.twig');
+        }
 
-        /** @var Document $document */
-        $document = $documentRepository->findOneBy(array('id' => $documentId));
+        $meetingLineId = intval($request->get('id'));
 
-        $document->setStatus(Document::STATUS_ENABLE);
+        /** @var MeetingLineRepository $meetingLineRepository */
+        $meetingLineRepository = $this->container->get('doctrine')->getManager()->getRepository('AppBundle:MeetingLine');
+
+        /** @var MeetingLine $meetingLine */
+        $meetingLine = $meetingLineRepository->findOneBy(array('id' => $meetingLineId));
+
+        $meetingLine->setStatus(MeetingLine::STATUS_ENABLE);
 
         $entityManager = $this->container->get('doctrine')->getManager();
-        $entityManager->persist($document);
+        $entityManager->persist($meetingLine);
         $entityManager->flush();
 
-        /** @var DocumentService $documentService */
-        $documentService = $this->container->get('app_document');
+        /** @var MeetingService $meetingService */
+        $meetingService = $this->container->get('app_meeting');
 
-        $documents = $documentService->getAllDocuments();
+        /** @var User $user */
+        $user = $this->container->get('security.token_storage')->getToken()->getUser();
 
-        return $this->render(':Document:list-document.html.twig', [
-            'documents' => $documents
+        $meetings = $meetingService->getMeetings($user->getPerson());
+
+        /** @var User $user */
+        $user = $this->container->get('security.token_storage')->getToken()->getUser();
+
+        return $this->render(':Meeting:list-meeting.html.twig', [
+            'meetings' => $meetings,
+            'type' => $user->getPerson()->getPersonType()->getId()
         ]);
     }
 }

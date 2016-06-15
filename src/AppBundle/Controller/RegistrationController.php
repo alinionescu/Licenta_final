@@ -8,6 +8,8 @@
 
 namespace AppBundle\Controller;
 
+use AppBundle\Entity\User;
+use AppBundle\Service\SecurityService;
 use FOS\UserBundle\Event\FilterUserResponseEvent;
 use FOS\UserBundle\Event\FormEvent;
 use FOS\UserBundle\Event\GetResponseUserEvent;
@@ -15,6 +17,8 @@ use FOS\UserBundle\FOSUserEvents;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use FOS\UserBundle\Controller\RegistrationController as BaseController;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorage;
+use Symfony\Component\Security\Core\Authorization\AuthorizationChecker;
 
 class RegistrationController extends BaseController
 {
@@ -24,6 +28,13 @@ class RegistrationController extends BaseController
      */
     public function registerAction(Request $request)
     {
+        /** @var SecurityService $securityService */
+        $securityService = $this->container->get('app_security');
+
+        if (!$securityService->isAdmin()) {
+            return $this->render(':admin:accessDenied.html.twig');
+        }
+
         /** @var $formFactory \FOS\UserBundle\Form\Factory\FactoryInterface */
         $formFactory = $this->get('fos_user.registration.form.factory');
         /** @var $userManager \FOS\UserBundle\Model\UserManagerInterface */
