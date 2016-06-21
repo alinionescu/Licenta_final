@@ -16,7 +16,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 
-class DefaultController extends Controller
+class DocumentController extends Controller
 {
     /**
      * @Route("/", name="homepage")
@@ -47,16 +47,15 @@ class DefaultController extends Controller
         /** @var User $user */
         $user = $this->container->get('security.token_storage')->getToken()->getUser();
 
-        $typeId = $user->getPerson()->getPersonType()->getId();
+        /** @var Person $person */
+        $person = $user->getPerson();
 
-        /** @var DocumentService $documentService */
-        $documentService = $this->container->get('app_document');
-
-        $documents = $documentService->getDocuments($user->getPerson());
+        /** @var Document[]|Document $documents */
+        $documents = $user->getPerson()->getDocuments();
 
         return $this->render(':Document:list-document.html.twig', [
             'documents' => $documents,
-            'type' => $typeId
+            'type' => $person->getPersonType()->getId()
         ]);
     }
 
@@ -83,19 +82,21 @@ class DefaultController extends Controller
         $form = $this->createForm(DocumentType::class, $document);
 
         if (null === $document) {
-            $this->get('session')->getFlashBag()->add('error', 'No Document Found');
-
-            $documents = $documentRepository->findAll();
+            $this->get('session')->getFlashBag()->add('error', 'Tema de licenta lipsa, ia legatura cu administratorul');
 
             /** @var User $user */
             $user = $this->container->get('security.token_storage')->getToken()->getUser();
 
-            $typeId = $user->getPerson()->getPersonType()->getId();
+            /** @var Person $person */
+            $person = $user->getPerson();
+
+            /** @var Document[] | Document $documents */
+            $documents = $person->getDocuments();
 
             return $this->render(':Document:list-document.html.twig', [
                 'documents' => $documents,
                 'form' => $form->createView(),
-                'type' => $typeId
+                'type' => $person->getPersonType()->getId()
             ]);
         }
 
@@ -196,19 +197,18 @@ class DefaultController extends Controller
         $entityManager->persist($document);
         $entityManager->flush();
 
-        /** @var DocumentService $documentService */
-        $documentService = $this->container->get('app_document');
-
         /** @var User $user */
         $user = $this->container->get('security.token_storage')->getToken()->getUser();
 
-        $typeId = $user->getPerson()->getPersonType()->getId();
+        /** @var Person $person */
+        $person = $user->getPerson();
 
-        $documents = $documentService->getDocuments($user->getPerson());
+        /** @var Document[] | Document $documents */
+        $documents = $person->getDocuments();
 
         return $this->render(':Document:list-document.html.twig', [
             'documents' => $documents,
-            'type' => $typeId
+            'type' => $person->getPersonType()->getId()
         ]);
     }
 
@@ -239,19 +239,18 @@ class DefaultController extends Controller
         $entityManager->persist($document);
         $entityManager->flush();
 
-        /** @var DocumentService $documentService */
-        $documentService = $this->container->get('app_document');
-
         /** @var User $user */
         $user = $this->container->get('security.token_storage')->getToken()->getUser();
 
-        $typeId = $user->getPerson()->getPersonType()->getId();
+        /** @var Person $person */
+        $person = $user->getPerson();
 
-        $documents = $documentService->getDocuments($user->getPerson());
+        /** @var Document[] | Document $documents */
+        $documents = $person->getDocuments();
 
         return $this->render(':Document:list-document.html.twig', [
             'documents' => $documents,
-            'type' => $typeId
+            'type' => $person->getPersonType()->getId()
         ]);
     }
 
@@ -273,9 +272,18 @@ class DefaultController extends Controller
             $documents = $documentService->getAllDocuments();
             $hasDocument = false;
         } else {
-            $hasDocument = true;
-            $documents = [$user->getPerson()->getDocument()];
-            $this->get('session')->getFlashBag()->add('success', 'Tema de licenta a fost aleasa');
+            /** @var Document|null $document */
+            $document = $user->getPerson()->getDocument();
+
+            if (empty($document) || $document->getStatus() == Document::STATUS_DISABLE) {
+                $hasDocument = false;
+                $documents = $documentService->getAllDocuments();
+                $this->get('session')->getFlashBag()->add('error', 'Tema de licenta a fost stearsa de profesor, ia legatura cu profesorul, sau alege alta tema de licenta');
+            } else {
+                $hasDocument = true;
+                $documents = [$document];
+                $this->get('session')->getFlashBag()->add('success', 'Tema de licenta a fost aleasa');
+            }
         }
 
         return $this->render(':Document:list-document.html.twig', [

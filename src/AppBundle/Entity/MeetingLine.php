@@ -25,7 +25,7 @@ class MeetingLine
 
     /**
      * @var string
-     * @ORM\Column(name="activitate", type="string", nullable=false)
+     * @ORM\Column(name="activitate", type="string", length=255, nullable=false)
      */
     protected $activitate;
 
@@ -56,7 +56,7 @@ class MeetingLine
 
     /**
      * @ORM\ManyToOne(targetEntity="Person")
-     * @ORM\JoinColumn(name="person_meet", referencedColumnName="id")
+     * @ORM\JoinColumn(name="person_meet", referencedColumnName="id", nullable=false)
      */
     protected $personMeet;
 

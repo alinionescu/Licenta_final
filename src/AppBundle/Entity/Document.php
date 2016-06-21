@@ -26,7 +26,7 @@ class Document
 
     /**
      * @var string
-     * @ORM\Column(name="name", type="string", length=64, nullable=false)
+     * @ORM\Column(name="name", type="string", length=255, nullable=false)
      */
     protected $name;
 

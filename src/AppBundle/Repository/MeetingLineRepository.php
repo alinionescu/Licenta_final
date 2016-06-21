@@ -2,7 +2,9 @@
 
 namespace AppBundle\Repository;
 
+use AppBundle\Entity\MeetingLine;
 use AppBundle\Entity\Person;
+use AppBundle\Form\MeetingLineType;
 use Doctrine\ORM\EntityRepository;
 
 class MeetingLineRepository extends EntityRepository
@@ -32,7 +34,8 @@ class MeetingLineRepository extends EntityRepository
         $query = $this->createQueryBuilder('ml')
             ->select('ml')
             ->leftJoin('ml.personMeet', 'p')
-            ->where('p.id = :person')->setParameter('person', $person->getId());
+            ->where('p.id = :person')->setParameter('person', $person->getId())
+            ->andWhere('ml.status = :status')->setParameter('status', MeetingLine::STATUS_ENABLE);
 
         $result = $query->getQuery()->getResult();
 

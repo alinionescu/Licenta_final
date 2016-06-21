@@ -2,6 +2,7 @@
 
 namespace AppBundle\Service;
 
+use AppBundle\Entity\Document;
 use AppBundle\Entity\Person;
 use AppBundle\Repository\DocumentRepository;
 use Doctrine\ORM\EntityManager;
@@ -23,25 +24,13 @@ class DocumentService
     /**
      * @return array
      */
-    public function getDocuments(Person $person)
-    {
-        /** @var DocumentRepository $documentRepository */
-        $documentRepository = $this->entityManager->getRepository('AppBundle:Document');
-
-        $documents = $documentRepository->getDocuments($person);
-
-        return $documents;
-    }
-
-    /**
-     * @return array
-     */
     public function getAllDocuments()
     {
         /** @var DocumentRepository $documentRepository */
         $documentRepository = $this->entityManager->getRepository('AppBundle:Document');
 
-        $documents = $documentRepository->findAll();
+        /** @var Document[]|Document $documents */
+        $documents = $documentRepository->getDocuments();
 
         return $documents;
     }

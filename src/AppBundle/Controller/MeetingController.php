@@ -65,12 +65,12 @@ class MeetingController extends Controller
         $form = $this->createForm(MeetingLineType::class, $meetingLine);
 
         if (null === $meetingLine) {
-            $this->get('session')->getFlashBag()->add('error', 'No MeetingLine Found');
-
-            $meetingLines = $meetingLineRepository->findAll();
+            $this->get('session')->getFlashBag()->add('error', 'Intalnire lipsa, ia legatura cu administratorul');
 
             /** @var User $user */
             $user = $this->container->get('security.token_storage')->getToken()->getUser();
+
+            $meetingLines = $user->getPerson()->getMeetingLines();
 
             return $this->render(':Meeting:list-meeting.html.twig', [
                 'meetings' => $meetingLines,
@@ -125,6 +125,14 @@ class MeetingController extends Controller
         if ($form->isValid() && $form->isSubmitted()) {
             $meetingLine = $form->getData();
 
+            if ($meetingLine->getPersonMeet() == null) {
+                $this->get('session')->getFlashBag()->add('error', 'Adauga perosana la intalnire');
+
+                return $this->render(':Meeting:add-meeting.html.twig', [
+                    'form' => $form->createView()
+                ]);
+            }
+
             /** @var User $user */
             $user = $this->container->get('security.token_storage')->getToken()->getUser();
 
@@ -173,19 +181,14 @@ class MeetingController extends Controller
         $entityManager->persist($meetingLine);
         $entityManager->flush();
 
-        /** @var MeetingService $meetingService */
-        $meetingService = $this->container->get('app_meeting');
-
         /** @var User $user */
         $user = $this->container->get('security.token_storage')->getToken()->getUser();
 
-        $meetings = $meetingService->getMeetings($user->getPerson());
-
-        /** @var User $user */
-        $user = $this->container->get('security.token_storage')->getToken()->getUser();
+        /** @var MeetingLine[]|MeetingLine $meetingLines */
+        $meetingLines = $user->getPerson()->getMeetingLines();
 
         return $this->render(':Meeting:list-meeting.html.twig', [
-            'meetings' => $meetings,
+            'meetings' => $meetingLines,
             'type' => $user->getPerson()->getPersonType()->getId()
         ]);
     }
@@ -217,19 +220,14 @@ class MeetingController extends Controller
         $entityManager->persist($meetingLine);
         $entityManager->flush();
 
-        /** @var MeetingService $meetingService */
-        $meetingService = $this->container->get('app_meeting');
-
         /** @var User $user */
         $user = $this->container->get('security.token_storage')->getToken()->getUser();
 
-        $meetings = $meetingService->getMeetings($user->getPerson());
-
-        /** @var User $user */
-        $user = $this->container->get('security.token_storage')->getToken()->getUser();
+        /** @var MeetingLine[]|MeetingLine $meetingLines */
+        $meetingLines = $user->getPerson()->getMeetingLines();
 
         return $this->render(':Meeting:list-meeting.html.twig', [
-            'meetings' => $meetings,
+            'meetings' => $meetingLines,
             'type' => $user->getPerson()->getPersonType()->getId()
         ]);
     }

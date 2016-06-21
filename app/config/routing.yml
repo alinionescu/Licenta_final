@@ -38,23 +38,23 @@ avanzu_admin_logout:
     path: /logout
 
 app_list_document:
-    defaults: { _controller: "AppBundle:Default:listDocument" }
+    defaults: { _controller: "AppBundle:Document:listDocument" }
     path: /list-document
 
 app_edit_document:
-    defaults: { _controller: "AppBundle:Default:editDocument", id: 0 }
+    defaults: { _controller: "AppBundle:Document:editDocument", id: 0 }
     path: /edit-document/{id}
 
 app_add_document:
-    defaults: { _controller: "AppBundle:Default:addDocument" }
+    defaults: { _controller: "AppBundle:Document:addDocument" }
     path: /add-document
 
 app_delete_document:
-    defaults: { _controller: "AppBundle:Default:deleteDocument" }
+    defaults: { _controller: "AppBundle:Document:deleteDocument" }
     path: /delete-document
 
 app_active_document:
-    defaults: { _controller: "AppBundle:Default:activeDocument" }
+    defaults: { _controller: "AppBundle:Document:activeDocument" }
     path: /active-document
 
 # intalniri
@@ -80,9 +80,9 @@ app_active_meeting:
     path: /active-meeting
 
 app_list_document_student:
-    defaults: { _controller: "AppBundle:Default:listDocumentsForStudent" }
+    defaults: { _controller: "AppBundle:Document:listDocumentsForStudent" }
     path: /list-document-student
 
 app_add_document_student:
-    defaults: { _controller: "AppBundle:Default:addDocumentStudent" }
+    defaults: { _controller: "AppBundle:Document:addDocumentStudent" }
     path: /add-document-student

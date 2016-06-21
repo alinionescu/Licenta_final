@@ -32,8 +32,9 @@ class MeetingLineType extends AbstractType
                         ->where('p.personType = :personType')->setParameter('personType', PersonType::PERSON_TYPE_STUDENT)
                         ->orderBy('p.id', 'ASC');
                 },
-                'choice_label' => 'name'
-            ]);
+                'choice_label' => 'name',
+                'required' => true
+            ])->add('status');
     }
 
     /**

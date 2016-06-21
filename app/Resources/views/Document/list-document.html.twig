@@ -37,6 +37,7 @@
             <th>Crt</th>
             <th>Nume Licenta</th>
             <th>Descriere</th>
+            <th>Optiuni</th>
             <th>Actions</th>
         </tr>
         </thead>
@@ -47,6 +48,7 @@
                     <td>{{ document.getId }}</td>
                     <td>{{ document.getName }}</td>
                     <td>{{ document.getDescription }}</td>
+                    <td>{{ document.getOption }}</td>
                     <td>
                         <div class="dropdown" style="float: left; margin-right: 5px">
                             <button class="btn btn-default dropdown-toggle" type="button" id="promote" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
@@ -70,6 +72,7 @@
                         <td>{{ document.getId }}</td>
                         <td>{{ document.getName }}</td>
                         <td>{{ document.getDescription }}</td>
+                        <td>{{ document.getOption }}</td>
                         {% if not hasDocument %}
                             <td>
                                 <div class="dropdown" style="float: left; margin-right: 5px">
