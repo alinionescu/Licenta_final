@@ -79,8 +79,8 @@ class MeetingController extends Controller
             ]);
         }
 
-        $form->handleRequest($request);
         $form->setData($meetingLine);
+        $form->handleRequest($request);
 
         if ($form->isValid() && $form->isSubmitted()) {
             $entityManager = $this->container->get('doctrine')->getManager();
